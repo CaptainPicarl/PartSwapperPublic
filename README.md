@@ -5,4 +5,4 @@ This repository will be used primarily for releases, limited sharing of project 
 
 Source code is manually exposed/uploaded, so it may lag behind what is in releases or my private repos.
 
-After downloading a release, I recommend visiting the [PartSwapper Wiki](https://github.com/CaptainPicarl/PartSwapperPublic/wiki/Get-Started)
+For an overview of PartSwapper, as well as instructions on how to get started - I recommend visiting the [PartSwapper Wiki.](https://github.com/CaptainPicarl/PartSwapperPublic/wiki/Get-Started)
