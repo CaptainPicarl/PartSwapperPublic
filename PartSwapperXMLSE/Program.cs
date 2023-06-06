@@ -770,9 +770,9 @@ namespace PartSwapper
                     PartSwapper.RenderSlowColoredText($"{category} = {partSwapper.parts[category].Count}\n", 0, ConsoleColor.DarkYellow);
                 }
 
-                PartSwapper.RenderSlowColoredText($"Please select which category you would like to upgrade:\n", 10, ConsoleColor.Cyan);
+                PartSwapper.RenderSlowColoredText($"Please select which category of parts you would like to swap:\n", 10, ConsoleColor.Cyan);
 
-                PartSwapper.RenderSlowColoredText($"1. Gyros\n2. Ion Thrusters\n3. Hydrogen Thrusters\n4. Batteries\nQ to quit editing this file.\n>", 10, ConsoleColor.DarkYellow);
+                PartSwapper.RenderSlowColoredText($"1. Gyroscopes\n2. Ion Thrusters\n3. Hydrogen Thrusters\n4. Batteries\n5. Jump Drives\nQ to quit editing this file.\nSelection >", 10, ConsoleColor.Magenta);
 
                 userInput = Console.ReadLine();
 
@@ -799,6 +799,9 @@ namespace PartSwapper
                         BatterySwapperTier(partSwapper, inputShipSBC);
                         //BatterySwapper(partSwapper, inputShipSBC);
                         break;
+                    case 5:
+                        JumpDriveSwapperTier(partSwapper, inputShipSBC); 
+                        break;
                     default:
                         Console.WriteLine("Assuming you want to quit! Bye!\n");
                         return;
@@ -810,7 +813,7 @@ namespace PartSwapper
                 switch (userInput.ToUpper())
                 {
                     case "Y":
-                        PartSwapper.RenderSlowColoredText("Swapping another part!\n\n", 20, ConsoleColor.Red);
+                        PartSwapper.RenderSlowColoredText("Swapping another part!\n\n", 10, ConsoleColor.Red);
                         break;
                     case "N":
                         Console.WriteLine("Quitting!");
@@ -1132,7 +1135,7 @@ namespace PartSwapper
                 {
                     if (!blocktype.ToUpper().Contains("HYDRO") && !blocktype.ToUpper().Contains("ATMO"))
                     {
-                        PartSwapper.RenderSlowColoredText($"Found block type {blocktype} on your ship! Eligible for replacement!\n", 5, ConsoleColor.Green);
+                        PartSwapper.RenderSlowColoredText($"Found block type {blocktype} on your ship! Eligible for replacement!\n", 10, ConsoleColor.Green);
                         UserShipCurrCatParts.Add(blocktype);
 
                     }
@@ -1182,7 +1185,6 @@ namespace PartSwapper
             {
                 foreach (string blocktype in partSwapper.blockVariants[blockvariant])
                 {
-                    Console.WriteLine($"{blocktype}");
 
                     if (blocktype.ToUpper().Contains("HYDRO") && blocktype.ToUpper().Contains("THRUST"))
                     {
@@ -1200,7 +1202,7 @@ namespace PartSwapper
             {
                 if (blocktype.ToUpper().Contains("HYDRO") && blocktype.ToUpper().Contains("THRUST"))
                 {
-                    PartSwapper.RenderSlowColoredText($"Found block type {blocktype} on your ship! Eligible for replacement!\n", 5, ConsoleColor.Green);
+                    PartSwapper.RenderSlowColoredText($"Found block type {blocktype} on your ship! Eligible for replacement!\n", 10, ConsoleColor.Green);
                     UserShipCurrCatParts.Add(blocktype);
                 }
                 else
@@ -1212,6 +1214,7 @@ namespace PartSwapper
 
             UserPruneList(UserShipCurrCatParts);
 
+            PartSwapper.RenderSlowColoredText("",10,ConsoleColor.Cyan);
             // Iterates through the blockvariants that are on the ship already, and the relevant blockvariants we found from blockvariant files,
             // And then we offer the user all the options for swapping out parts.
             foreach (string blockvariant in UserShipCurrCatParts)
@@ -1265,7 +1268,7 @@ namespace PartSwapper
             {
                 if (blocktype.ToUpper().Contains("BATTERY"))
                 {
-                    PartSwapper.RenderSlowColoredText($"Found block type {blocktype} on your ship! Eligible for replacement!\n", 5, ConsoleColor.Green);
+                    PartSwapper.RenderSlowColoredText($"Found block type {blocktype} on your ship! Eligible for replacement!\n", 10, ConsoleColor.Green);
                     UserShipCurrCatParts.Add(blocktype);
                 }
                 else
@@ -1329,7 +1332,73 @@ namespace PartSwapper
             {
                 if (blocktype.ToUpper().Contains("GYRO"))
                 {
-                    PartSwapper.RenderSlowColoredText($"Found block type {blocktype} on your ship! Eligible for replacement!\n", 5, ConsoleColor.Green);
+                    PartSwapper.RenderSlowColoredText($"Found block type {blocktype} on your ship! Eligible for replacement!\n", 10, ConsoleColor.Green);
+                    UserShipCurrCatParts.Add(blocktype);
+                }
+                else
+                {
+                    continue;
+                }
+
+            }
+
+            UserPruneList(UserShipCurrCatParts);
+
+            // Iterates through the blockvariants that are on the ship already, and the relevant blockvariants we found from blockvariant files,
+            // And then we offer the user all the options for swapping out parts.
+            foreach (string blockvariant in UserShipCurrCatParts)
+            {
+                string blockvarSubstring = blockvariant.Remove(blockvariant.Length - 3);
+                List<string> tieredBlocks = UserPartCategoriesOpts.Where(item => item.Contains(blockvariant.Substring(0, blockvariant.Length - 2))).ToList();
+
+                for (int i = 0; i < tieredBlocks.Count<string>(); i++)
+                {
+                    Console.WriteLine($"{i} - {tieredBlocks[i]}");
+                }
+
+                Console.WriteLine($"What should we replace {blockvariant} with?");
+
+                userInput = Console.ReadLine();
+                userInputInt = int.Parse(userInput);
+
+                PartSwapper.SwapPartsViaPartname(inputShipSBC, blockvariant, tieredBlocks[userInputInt], false);
+
+                Console.WriteLine($"{blockvariant} has been replaced with {tieredBlocks[userInputInt]}");
+            }
+
+        }
+
+        public static void JumpDriveSwapperTier(PartSwapper partSwapper, string inputShipSBC)
+        {
+            string userInput = "";
+            int userInputInt = -1;
+            string inputPartSwapOut;
+            string inputPartSwapIn;
+
+            List<string> UserPartCategoriesOpts = new List<string>();
+            List<string> UserShipCurrCatParts = new List<string>();
+
+            foreach (string blockvariant in partSwapper.blockVariants.Keys)
+            {
+                foreach (string blocktype in partSwapper.blockVariants[blockvariant])
+                {
+                    if (blocktype.ToUpper().Contains("JUMPDRIVE"))
+                    {
+                        UserPartCategoriesOpts.Add(blocktype);
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+
+
+            foreach (string blocktype in partSwapper.parts.Keys)
+            {
+                if (blocktype.ToUpper().Contains("JUMPDRIVE"))
+                {
+                    PartSwapper.RenderSlowColoredText($"Found block type {blocktype} on your ship! Eligible for replacement!\n", 10, ConsoleColor.Green);
                     UserShipCurrCatParts.Add(blocktype);
                 }
                 else
@@ -1374,7 +1443,7 @@ namespace PartSwapper
 
             while (!QuitFlag)
             {
-                Console.WriteLine("Are there any of these parts you don't want to swap out? If so - select what you don't want to edit.\nSelect a number to exclude it from partswapping.\nWhen finished, type 'C' to continue...");
+                Console.WriteLine("We will be swapping out the following parts. Please select the category of parts you DO NOT WANT TO SWAP!\nWhen finished, type 'C' to continue...");
 
                 for (int i = 0; i < list.Count; i++)
                 {
