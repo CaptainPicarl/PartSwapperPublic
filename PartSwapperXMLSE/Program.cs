@@ -5,6 +5,7 @@ using System.Xml.Linq;
 using System.Windows;
 using System.IO;
 using System.Text;
+using Microsoft.VisualBasic.FileIO;
 
 namespace PartSwapper
 {
@@ -614,18 +615,17 @@ namespace PartSwapper
 
             string welcome = "<--Picarl's PartSwapper-->\n";
 
-            RenderSlowColoredText(welcome, 5, ConsoleColor.DarkGray);
+            RenderSlowColoredText(welcome, 15, ConsoleColor.DarkGray);
 
             Console.ForegroundColor = preserve;
         }
 
-        public static DirectoryInfo[] sbcLocator()
+        public static DirectoryInfo[] GetLocalDirectories()
         {
             DirectoryInfo d = new DirectoryInfo(Directory.GetCurrentDirectory());
             DirectoryInfo[] result = d.GetDirectories();
 
             return result;
-
         }
 
         public static void REPLProto1()
@@ -1443,7 +1443,7 @@ namespace PartSwapper
 
             while (!QuitFlag)
             {
-                Console.WriteLine("We will be swapping out the following parts. Please select the category of parts you DO NOT WANT TO SWAP!\nWhen finished, type 'C' to continue...");
+                Console.WriteLine("We will be swapping out the following parts. Please select the category of parts you DO NOT WANT TO SWAP OUT!\nWhen finished, type 'C' to continue and begin swapping parts. (case insensitive)");
 
                 for (int i = 0; i < list.Count; i++)
                 {
@@ -1451,7 +1451,7 @@ namespace PartSwapper
                 }
                 UserInput = Console.ReadLine();
 
-                if (UserInput == "C")
+                if (UserInput.ToUpper() == "C")
                 {
                     return;
                 }
@@ -1497,23 +1497,65 @@ namespace PartSwapper
                 //}
             }
 
-            blueprints = sbcLocator();
-
+            blueprints = GetLocalDirectories();
+            Console.WriteLine("PartSwapper found the following eligible blueprint folders:");
+            // iterates through all the blueprint directories we found and 
             for (int i = 0; i < blueprints.Length; i++)
             {
                 blueprintFiles = blueprints[i].GetFiles("bp.sbc");
-                Console.WriteLine($"Found Directory {blueprints[i].FullName}");
+
+                for (int j = 0; j < blueprintFiles.Length; j++)
+                {
+                    if (blueprintFiles[j].Name == "bp.sbc")
+                    {
+                        Console.WriteLine($"{i} - {blueprints[i].Name}");
+                    }
+                }
+            }
+
+            PartSwapper.RenderSlowColoredText("Which blueprint you would like to swap parts out of?\nEnter number>",5,ConsoleColor.Cyan);
+            userInput = Console.ReadLine();
+
+            if(userInput.ToUpper() == "Q")
+            {
+                Console.WriteLine("Quitting!");
+                return;
+            }
+
+            if (blueprints[int.Parse(userInput)] == null)
+            {
+                Console.WriteLine("Invalid blueprint number!");
+            } else
+            {
+                blueprintFiles = blueprints[int.Parse(userInput)].GetFiles("bp.sbc");
+
                 foreach (FileInfo blueprintFile in blueprintFiles)
                 {
-                    Console.WriteLine($"Found file {blueprintFile.Name}");
+                    Console.WriteLine($"Found blueprint file {blueprintFile.Name}");
                     if (blueprintFile.Name == "bp.sbc")
                     {
+                        Console.WriteLine("Found bp.sbc! Opening the ship up!");
                         REPL(blueprintFile.FullName);
                     }
                 }
             }
 
-            Console.WriteLine("End of program");
+            /*
+                           blueprintFiles = blueprints[i].GetFiles("bp.sbc");
+
+                foreach (FileInfo blueprintFile in blueprintFiles)
+                {
+                    Console.WriteLine($"Found blueprint file {blueprintFile.Name}");
+                    if (blueprintFile.Name == "bp.sbc")
+                    {
+                        REPL(blueprintFile.FullName);
+                    }
+                }
+
+
+            */
+
+            Console.WriteLine("No more blueprints found to swap parts out of. Bye!\n");
         }
 
         // Idea behind loadDefinitions:
@@ -1533,14 +1575,12 @@ namespace PartSwapper
             Dictionary<string, HashSet<string>> Result = new Dictionary<string, HashSet<string>>();
             HashSet<string> categorySet = new HashSet<string>();
 
-
             // Iterate through each file...
             foreach (FileInfo file in BlockVariantFilesList)
             {
                 XElement root = XElement.Load(file.ToString());
 
                 XElement BlockVariantGroups = root.Element("BlockVariantGroups");
-
 
                 if (debug)
                 {
