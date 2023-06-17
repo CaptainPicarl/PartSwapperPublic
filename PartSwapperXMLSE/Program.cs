@@ -11,7 +11,8 @@ namespace PartSwapper
 {
     public class PartSwapper
     {
-        public static List<string> PartInclusions = new List<string>{                "LargeAdvancedStator",
+        static List<string> PartInclusions = new List<string>{
+                "LargeAdvancedStator",
                 "LargeHinge",
                 "LargeHingeHead",
                 "LargeLCDPanelWide",
@@ -593,35 +594,34 @@ namespace PartSwapper
                 "LargeOffensiveCombat",
                 "EmotionControllerLarge", };
 
-        public static bool debug = false;
+        public static bool Debug = false;
 
         // declarations for collections of ship parts and their category names, as well as modblocks
-        public Dictionary<string, List<XElement>> parts = new Dictionary<string, List<XElement>>();
-        public Dictionary<string, HashSet<string>> blockVariants;
+        public Dictionary<string, List<XElement>> ShipParts = new Dictionary<string, List<XElement>>();
 
-        List<string> ShipPartCategories = new List<string>();
+        public Dictionary<string, HashSet<string>> BlockVariantsAvail;
 
         public PartSwapper(string filename)
         {
-            parts = generatePartsLists(filename);
-            blockVariants = LoadBlockVariantsDict();
+            ShipParts = GenerateShipPartsList(filename);
+            BlockVariantsAvail = LoadBlockVariantsDict();
         }
 
-        public static void renderTextIntro()
+        public static void RenderTextIntro()
         {
 
             string welcome = "<--Picarl's PartSwapper-->\n";
 
-            RenderSlowColoredText(welcome, 15, ConsoleColor.DarkRed);
+            RenderSlowColoredText(welcome, 30, ConsoleColor.Black, ConsoleColor.Green);
 
         }
 
         public static DirectoryInfo[] GetLocalDirectories()
         {
-            DirectoryInfo d = new DirectoryInfo(Directory.GetCurrentDirectory());
-            DirectoryInfo[] result = d.GetDirectories();
+            DirectoryInfo Directory = new DirectoryInfo(System.IO.Directory.GetCurrentDirectory());
+            DirectoryInfo[] LocalDirectories = Directory.GetDirectories();
 
-            return result;
+            return LocalDirectories;
         }
 
         public static void REPLProto1()
@@ -631,7 +631,7 @@ namespace PartSwapper
             string inputPartSwapOut;
             string inputPartSwapIn;
 
-            renderTextIntro();
+            RenderTextIntro();
             // partSwapper represents the ship we want to work on.
             PartSwapper partSwapper;
 
@@ -651,7 +651,7 @@ namespace PartSwapper
             {
                 partSwapper = new PartSwapper(inputShipSBC);
 
-                foreach (string part in partSwapper.parts.Keys)
+                foreach (string part in partSwapper.ShipParts.Keys)
                 {
                     Console.WriteLine(part);
                 }
@@ -667,14 +667,14 @@ namespace PartSwapper
                     return;
                 }
 
-                if (partSwapper.parts.Keys.Contains(inputPartSwapOut))
+                if (partSwapper.ShipParts.Keys.Contains(inputPartSwapOut))
                 {
                     // do next partswap
                     PartSwapper.RenderSlowColoredText("Please pick a replacement part for the category you have chosen.\nPart options are (This will be long):\n", 10, ConsoleColor.Red);
 
-                    foreach (string modBlockFile in partSwapper.blockVariants.Keys)
+                    foreach (string modBlockFile in partSwapper.BlockVariantsAvail.Keys)
                     {
-                        foreach (string part in partSwapper.blockVariants[modBlockFile])
+                        foreach (string part in partSwapper.BlockVariantsAvail[modBlockFile])
                         {
                             Console.WriteLine();
                         }
@@ -692,7 +692,7 @@ namespace PartSwapper
                     }
 
 
-                    PartSwapper.SwapPartsViaPartname(inputShipSBC, inputPartSwapOut, inputPartSwapIn, debug);
+                    PartSwapper.SwapPartsViaPartname(inputShipSBC, inputPartSwapOut, inputPartSwapIn, Debug);
 
                     Console.WriteLine("Swap another part? Y/N");
 
@@ -736,14 +736,14 @@ namespace PartSwapper
 
                 PartSwapper.RenderSlowColoredText("Ship loaded.\n", 10, ConsoleColor.Cyan);
 
-                if (debug)
+                if (Debug)
                 {
-                    foreach (string blocktype in partSwapper.blockVariants.Keys)
+                    foreach (string blocktype in partSwapper.BlockVariantsAvail.Keys)
                     {
                         Console.WriteLine("Found the following blockvariant key:");
                         Console.WriteLine(blocktype);
                         Console.WriteLine("Found the following blockvariant values:");
-                        foreach (string value in partSwapper.blockVariants[blocktype])
+                        foreach (string value in partSwapper.BlockVariantsAvail[blocktype])
                         {
                             Console.WriteLine(value);
                         }
@@ -754,15 +754,15 @@ namespace PartSwapper
 
                 PartSwapper.RenderSlowColoredText("Found the following parts on your ship:\n", 10, ConsoleColor.Cyan);
 
-                foreach (string category in partSwapper.parts.Keys)
+                foreach (string category in partSwapper.ShipParts.Keys)
                 {
                     //Console.WriteLine($"{category} = {partSwapper.parts[category].Count}");
-                    PartSwapper.RenderSlowColoredText($"{category} = {partSwapper.parts[category].Count}\n", 0, ConsoleColor.DarkYellow);
+                    PartSwapper.RenderSlowColoredText($"{category} = {partSwapper.ShipParts[category].Count}\n", 0, ConsoleColor.DarkYellow);
                 }
 
                 PartSwapper.RenderSlowColoredText($"\nPlease select which category of parts you would like to swap:\n", 10, ConsoleColor.Magenta);
 
-                PartSwapper.RenderSlowColoredText($"1. Gyroscopes\n2. Ion Thrusters\n3. Hydrogen Thrusters\n4. Batteries\n5. Jump Drives\nQ to quit editing this file.\nSelection > ", 10, ConsoleColor.DarkMagenta);
+                PartSwapper.RenderSlowColoredText($"1. Gyroscopes\n2. Ion Thrusters\n3. Hydrogen Thrusters\n4. Batteries\n5. Jump Drives\n6. Hydrogen Tanks\n7. Oxygen Tanks\n8. Cargo Containers\nQ to quit editing this file.\nSelection > ", 10, ConsoleColor.DarkMagenta);
 
                 userInput = Console.ReadLine();
 
@@ -775,38 +775,43 @@ namespace PartSwapper
                 {
                     case 1:
                         GyroSwapperTier(partSwapper, inputShipSBC);
-                        //GyroSwapper(partSwapper, inputShipSBC);
                         break;
                     case 2:
                         IonThrusterSwapperTier(partSwapper, inputShipSBC);
-                        //IonThrusterSwapper(partSwapper, inputShipSBC);
                         break;
                     case 3:
                         HydrogenThrusterSwapperTier(partSwapper, inputShipSBC);
-                        //HydrogenThrusterSwapper(partSwapper, inputShipSBC);
                         break;
                     case 4:
                         BatterySwapperTier(partSwapper, inputShipSBC);
-                        //BatterySwapper(partSwapper, inputShipSBC);
                         break;
                     case 5:
                         JumpDriveSwapperTier(partSwapper, inputShipSBC); 
                         break;
+                    case 6:
+                        HydroTankSwapperTier(partSwapper, inputShipSBC);
+                        break;
+                    case 7:
+                        OxygenTankSwapperTier(partSwapper, inputShipSBC);
+                        break;
+                    case 8:
+                        CargoContainerSwapperTier(partSwapper, inputShipSBC);
+                        break;
                     default:
-                        Console.WriteLine("Assuming you want to quit! Bye!\n");
+                        Console.WriteLine("You chose something absurd. I'm quitting. Bye!\n");
                         return;
                 }
 
-                Console.WriteLine("Swap another part? Y/N");
+                Console.WriteLine("Swap another part in this ship? Y/N");
                 userInput = Console.ReadLine();
 
                 switch (userInput.ToUpper())
                 {
                     case "Y":
-                        PartSwapper.RenderSlowColoredText("Swapping another part!\n\n", 10, ConsoleColor.Red);
+                        PartSwapper.RenderSlowColoredText("Swapping another part!\n", 5, ConsoleColor.Red);
                         break;
                     case "N":
-                        Console.WriteLine("Quitting!");
+                        Console.WriteLine("Ending Program!");
                         quitflag = true;
                         break;
                 }
@@ -829,6 +834,7 @@ namespace PartSwapper
             ConsoleColor preserve = Console.ForegroundColor;
 
             Console.ForegroundColor = color;
+            Console.BackgroundColor = ConsoleColor.Black;
 
             foreach (char letter in text)
             {
@@ -836,6 +842,104 @@ namespace PartSwapper
                 Console.Write(letter);
             }
             Console.ForegroundColor = preserve;
+        }
+
+        public static void RenderSlowColoredText(string text, int delay, ConsoleColor foregroundColor, ConsoleColor backgroundColor)
+        {
+            ConsoleColor preserveFG = Console.ForegroundColor;
+            ConsoleColor preserveBG = Console.BackgroundColor;
+
+            Console.ForegroundColor = foregroundColor;
+            Console.BackgroundColor = backgroundColor;
+
+            foreach (char letter in text)
+            {
+                Thread.Sleep(delay);
+                Console.Write(letter);
+            }
+
+            Console.ForegroundColor = preserveFG;
+            Console.BackgroundColor = preserveBG;
+        }
+        // TODO: figure out if this generic swapper is doable and worth it.
+        // The idea is that is uses a switch and some given 'input category string'
+        public static void GenericSwapper(PartSwapper partSwapper, string inputShipSBC, string partCategory)
+        {
+            int userInputInt = -1;
+            string userInput = "";
+            string inputPartSwapOut;
+            string inputPartSwapIn;
+
+            
+
+            List<string> UserPartCategoriesOpts = new List<string>();
+            List<string> UserShipCurrCatParts = new List<string>();
+
+            foreach (string blockvariant in partSwapper.BlockVariantsAvail.Keys)
+            {
+                foreach (string blocktype in partSwapper.BlockVariantsAvail[blockvariant])
+                {
+
+                    switch (partCategory.ToUpper())
+                    {
+                        case "IONTHRUST":
+                            if (blocktype.ToUpper().Contains("THRUST"))
+                            {
+                                if (!blocktype.ToUpper().Contains("HYDRO") && !blocktype.ToUpper().Contains("ATMO"))
+                                {
+                                    UserPartCategoriesOpts.Add(blocktype);
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+
+
+                }
+            }
+
+
+            foreach (string blocktype in partSwapper.ShipParts.Keys)
+            {
+                if (blocktype.ToUpper().Contains("THRUST"))
+                {
+                    if (!blocktype.ToUpper().Contains("HYDRO") && !blocktype.ToUpper().Contains("ATMO"))
+                    {
+                        UserShipCurrCatParts.Add(blocktype);
+                        Console.WriteLine($"Found blocktype {blocktype}, all instances will be replaced!");
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+
+            UserPruneList(UserShipCurrCatParts);
+
+            Console.WriteLine("What should we replace the above parts with?\n Selection > ");
+
+            // Next, Iterate through what we found, and offer the user options:
+            for (int i = 0; i < UserPartCategoriesOpts.Count; i++)
+            {
+                Console.WriteLine($"{i} - {UserPartCategoriesOpts[i]}");
+            }
+
+            userInput = Console.ReadLine();
+            userInputInt = int.Parse(userInput);
+
+            Console.WriteLine($"Replacing all with {UserPartCategoriesOpts[userInputInt]}");
+
+            // Finally: Replace.
+            foreach (string option in UserShipCurrCatParts)
+            {
+                SwapPartsViaPartname(inputShipSBC, option, UserPartCategoriesOpts[userInputInt], false);
+            }
         }
 
         public static void IonThrusterSwapper(PartSwapper partSwapper, string inputShipSBC)
@@ -848,9 +952,9 @@ namespace PartSwapper
             List<string> UserPartCategoriesOpts = new List<string>();
             List<string> UserShipCurrCatParts = new List<string>();
 
-            foreach (string blockvariant in partSwapper.blockVariants.Keys)
+            foreach (string blockvariant in partSwapper.BlockVariantsAvail.Keys)
             {
-                foreach (string blocktype in partSwapper.blockVariants[blockvariant])
+                foreach (string blocktype in partSwapper.BlockVariantsAvail[blockvariant])
                 {
                     if (blocktype.ToUpper().Contains("THRUST"))
                     {
@@ -867,7 +971,7 @@ namespace PartSwapper
             }
 
 
-            foreach (string blocktype in partSwapper.parts.Keys)
+            foreach (string blocktype in partSwapper.ShipParts.Keys)
             {
                 if (blocktype.ToUpper().Contains("THRUST"))
                 {
@@ -914,9 +1018,9 @@ namespace PartSwapper
             List<string> UserPartCategoriesOpts = new List<string>();
             List<string> UserShipCurrCatParts = new List<string>();
 
-            foreach (string blockvariant in partSwapper.blockVariants.Keys)
+            foreach (string blockvariant in partSwapper.BlockVariantsAvail.Keys)
             {
-                foreach (string blocktype in partSwapper.blockVariants[blockvariant])
+                foreach (string blocktype in partSwapper.BlockVariantsAvail[blockvariant])
                 {
                     Console.WriteLine($"{blocktype}");
 
@@ -932,7 +1036,7 @@ namespace PartSwapper
             }
 
 
-            foreach (string blocktype in partSwapper.parts.Keys)
+            foreach (string blocktype in partSwapper.ShipParts.Keys)
             {
                 if (blocktype.ToUpper().Contains("HYDRO") && blocktype.ToUpper().Contains("THRUST"))
                 {
@@ -977,9 +1081,9 @@ namespace PartSwapper
             List<string> UserPartCategoriesOpts = new List<string>();
             List<string> UserShipCurrCatParts = new List<string>();
 
-            foreach (string blockvariant in partSwapper.blockVariants.Keys)
+            foreach (string blockvariant in partSwapper.BlockVariantsAvail.Keys)
             {
-                foreach (string blocktype in partSwapper.blockVariants[blockvariant])
+                foreach (string blocktype in partSwapper.BlockVariantsAvail[blockvariant])
                 {
                     if (blocktype.ToUpper().Contains("BATTERY"))
                     {
@@ -993,7 +1097,7 @@ namespace PartSwapper
             }
 
 
-            foreach (string blocktype in partSwapper.parts.Keys)
+            foreach (string blocktype in partSwapper.ShipParts.Keys)
             {
                 if (blocktype.ToUpper().Contains("BATTERY"))
                 {
@@ -1038,9 +1142,9 @@ namespace PartSwapper
             List<string> UserPartCategoriesOpts = new List<string>();
             List<string> UserShipCurrCatParts = new List<string>();
 
-            foreach (string blockvariant in partSwapper.blockVariants.Keys)
+            foreach (string blockvariant in partSwapper.BlockVariantsAvail.Keys)
             {
-                foreach (string blocktype in partSwapper.blockVariants[blockvariant])
+                foreach (string blocktype in partSwapper.BlockVariantsAvail[blockvariant])
                 {
                     if (blocktype.ToUpper().Contains("GYRO"))
                     {
@@ -1054,7 +1158,7 @@ namespace PartSwapper
             }
 
 
-            foreach (string blocktype in partSwapper.parts.Keys)
+            foreach (string blocktype in partSwapper.ShipParts.Keys)
             {
                 if (blocktype.ToUpper().Contains("GYRO"))
                 {
@@ -1090,6 +1194,88 @@ namespace PartSwapper
             }
         }
 
+        public static void AtmoThrusterSwapperTier(PartSwapper partSwapper, string inputShipSBC)
+        {
+            string userInput = "";
+            int userInputInt = -1;
+            string inputPartSwapOut;
+            string inputPartSwapIn;
+
+            List<string> UserPartCategoriesOpts = new List<string>();
+            List<string> UserShipCurrCatParts = new List<string>();
+
+            foreach (string blockvariant in partSwapper.BlockVariantsAvail.Keys)
+            {
+                foreach (string blocktype in partSwapper.BlockVariantsAvail[blockvariant])
+                {
+
+                    if (!blocktype.ToUpper().Contains("HYDRO") && blocktype.ToUpper().Contains("ATMO") && blocktype.ToUpper().Contains("THRUST"))
+                    {
+                        UserPartCategoriesOpts.Add(blocktype);
+                    }
+                    else
+                    {
+                        continue;
+                    }
+
+                }
+            }
+
+            foreach (string blocktype in partSwapper.ShipParts.Keys)
+            {
+                if (blocktype.ToUpper().Contains("THRUST"))
+                {
+                    if (!blocktype.ToUpper().Contains("HYDRO") && blocktype.ToUpper().Contains("ATMO") && blocktype.ToUpper().Contains("THRUST"))
+                    {
+                        PartSwapper.RenderSlowColoredText($"Found block type {blocktype} on your ship! Eligible for replacement!\n", 10, ConsoleColor.Green);
+                        UserShipCurrCatParts.Add(blocktype);
+
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+
+            UserPruneList(UserShipCurrCatParts);
+
+            // Iterates through the blockvariants that are on the ship already, and the relevant blockvariants we found from blockvariant files,
+            // And then we offer the user all the options for swapping out parts.
+            foreach (string blockvariant in UserShipCurrCatParts)
+            {
+                string blockvarSubstring = blockvariant.Remove(blockvariant.Length - 3);
+                List<string> tieredBlocks = UserPartCategoriesOpts.Where(item => item.Contains(blockvariant.Substring(0, blockvariant.Length - 2))).Distinct<string>().ToList();
+
+                for (int i = 0; i < tieredBlocks.Count<string>(); i++)
+                {
+                    Console.WriteLine($"{i} - {tieredBlocks[i]}");
+                }
+
+                Console.WriteLine($"What should we replace {blockvariant} with? C to continue.");
+
+                userInput = Console.ReadLine();
+
+                if (IsUserQuitting(userInput.ToUpper()))
+                {
+                    return;
+                }
+
+                if (userInput.ToUpper() == "C")
+                {
+                    Console.WriteLine("Continuing.");
+                    continue;
+                }
+
+                userInputInt = int.Parse(userInput);
+
+                PartSwapper.SwapPartsViaPartname(inputShipSBC, blockvariant, tieredBlocks[userInputInt], false);
+
+                Console.WriteLine($"{blockvariant} has been replaced with {tieredBlocks[userInputInt]}");
+            }
+        }
+
+
         public static void IonThrusterSwapperTier(PartSwapper partSwapper, string inputShipSBC)
         {
             string userInput = "";
@@ -1100,9 +1286,9 @@ namespace PartSwapper
             List<string> UserPartCategoriesOpts = new List<string>();
             List<string> UserShipCurrCatParts = new List<string>();
 
-            foreach (string blockvariant in partSwapper.blockVariants.Keys)
+            foreach (string blockvariant in partSwapper.BlockVariantsAvail.Keys)
             {
-                foreach (string blocktype in partSwapper.blockVariants[blockvariant])
+                foreach (string blocktype in partSwapper.BlockVariantsAvail[blockvariant])
                 {
 
                     if (!blocktype.ToUpper().Contains("HYDRO") && !blocktype.ToUpper().Contains("ATMO") && blocktype.ToUpper().Contains("THRUST"))
@@ -1117,7 +1303,7 @@ namespace PartSwapper
                 }
             }
 
-            foreach (string blocktype in partSwapper.parts.Keys)
+            foreach (string blocktype in partSwapper.ShipParts.Keys)
             {
                 if (blocktype.ToUpper().Contains("THRUST"))
                 {
@@ -1181,9 +1367,9 @@ namespace PartSwapper
             List<string> UserPartCategoriesOpts = new List<string>();
             List<string> UserShipCurrCatParts = new List<string>();
 
-            foreach (string blockvariant in partSwapper.blockVariants.Keys)
+            foreach (string blockvariant in partSwapper.BlockVariantsAvail.Keys)
             {
-                foreach (string blocktype in partSwapper.blockVariants[blockvariant])
+                foreach (string blocktype in partSwapper.BlockVariantsAvail[blockvariant])
                 {
 
                     if (blocktype.ToUpper().Contains("HYDRO") && blocktype.ToUpper().Contains("THRUST"))
@@ -1198,7 +1384,7 @@ namespace PartSwapper
             }
 
 
-            foreach (string blocktype in partSwapper.parts.Keys)
+            foreach (string blocktype in partSwapper.ShipParts.Keys)
             {
                 if (blocktype.ToUpper().Contains("HYDRO") && blocktype.ToUpper().Contains("THRUST"))
                 {
@@ -1260,9 +1446,9 @@ namespace PartSwapper
             List<string> UserPartCategoriesOpts = new List<string>();
             List<string> UserShipCurrCatParts = new List<string>();
 
-            foreach (string blockvariant in partSwapper.blockVariants.Keys)
+            foreach (string blockvariant in partSwapper.BlockVariantsAvail.Keys)
             {
-                foreach (string blocktype in partSwapper.blockVariants[blockvariant])
+                foreach (string blocktype in partSwapper.BlockVariantsAvail[blockvariant])
                 {
                     if (blocktype.ToUpper().Contains("BATTERY"))
                     {
@@ -1276,7 +1462,7 @@ namespace PartSwapper
                 }
             }
 
-            foreach (string blocktype in partSwapper.parts.Keys)
+            foreach (string blocktype in partSwapper.ShipParts.Keys)
             {
                 if (blocktype.ToUpper().Contains("BATTERY"))
                 {
@@ -1336,9 +1522,9 @@ namespace PartSwapper
             List<string> UserPartCategoriesOpts = new List<string>();
             List<string> UserShipCurrCatParts = new List<string>();
 
-            foreach (string blockvariant in partSwapper.blockVariants.Keys)
+            foreach (string blockvariant in partSwapper.BlockVariantsAvail.Keys)
             {
-                foreach (string blocktype in partSwapper.blockVariants[blockvariant])
+                foreach (string blocktype in partSwapper.BlockVariantsAvail[blockvariant])
                 {
                     if (blocktype.ToUpper().Contains("GYRO"))
                     {
@@ -1352,7 +1538,7 @@ namespace PartSwapper
             }
 
 
-            foreach (string blocktype in partSwapper.parts.Keys)
+            foreach (string blocktype in partSwapper.ShipParts.Keys)
             {
                 if (blocktype.ToUpper().Contains("GYRO"))
                 {
@@ -1414,9 +1600,9 @@ namespace PartSwapper
             List<string> UserPartCategoriesOpts = new List<string>();
             List<string> UserShipCurrCatParts = new List<string>();
 
-            foreach (string blockvariant in partSwapper.blockVariants.Keys)
+            foreach (string blockvariant in partSwapper.BlockVariantsAvail.Keys)
             {
-                foreach (string blocktype in partSwapper.blockVariants[blockvariant])
+                foreach (string blocktype in partSwapper.BlockVariantsAvail[blockvariant])
                 {
                     if (blocktype.ToUpper().Contains("JUMPDRIVE"))
                     {
@@ -1430,9 +1616,243 @@ namespace PartSwapper
             }
 
 
-            foreach (string blocktype in partSwapper.parts.Keys)
+            foreach (string blocktype in partSwapper.ShipParts.Keys)
             {
                 if (blocktype.ToUpper().Contains("JUMPDRIVE"))
+                {
+                    PartSwapper.RenderSlowColoredText($"Found block type {blocktype} on your ship! Eligible for replacement!\n", 10, ConsoleColor.Green);
+                    UserShipCurrCatParts.Add(blocktype);
+                }
+                else
+                {
+                    continue;
+                }
+
+            }
+
+            UserPruneList(UserShipCurrCatParts);
+
+            // Iterates through the blockvariants that are on the ship already, and the relevant blockvariants we found from blockvariant files,
+            // And then we offer the user all the options for swapping out parts.
+            foreach (string blockvariant in UserShipCurrCatParts)
+            {
+                string blockvarSubstring = blockvariant.Remove(blockvariant.Length - 3);
+                List<string> tieredBlocks = UserPartCategoriesOpts.Where(item => item.Contains(blockvariant.Substring(0, blockvariant.Length - 2))).Distinct<string>().ToList();
+
+                for (int i = 0; i < tieredBlocks.Count<string>(); i++)
+                {
+                    Console.WriteLine($"{i} - {tieredBlocks[i]}");
+                }
+
+                Console.WriteLine($"What should we replace {blockvariant} with? C to continue.");
+
+                userInput = Console.ReadLine();
+
+                if (IsUserQuitting(userInput.ToUpper()))
+                {
+                    return;
+                }
+
+                if (userInput.ToUpper() == "C")
+                {
+                    Console.WriteLine("Continuing.");
+                    continue;
+                }
+
+                userInputInt = int.Parse(userInput);
+
+                PartSwapper.SwapPartsViaPartname(inputShipSBC, blockvariant, tieredBlocks[userInputInt], false);
+
+                Console.WriteLine($"{blockvariant} has been replaced with {tieredBlocks[userInputInt]}");
+            }
+
+        }
+
+        public static void HydroTankSwapperTier(PartSwapper partSwapper, string inputShipSBC)
+        {
+            string userInput = "";
+            int userInputInt = -1;
+            string inputPartSwapOut;
+            string inputPartSwapIn;
+
+            List<string> UserPartCategoriesOpts = new List<string>();
+            List<string> UserShipCurrCatParts = new List<string>();
+
+            foreach (string blockvariant in partSwapper.BlockVariantsAvail.Keys)
+            {
+                foreach (string blocktype in partSwapper.BlockVariantsAvail[blockvariant])
+                {
+                    if (blocktype.ToUpper().Contains("HYDROGENTANK"))
+                    {
+                        UserPartCategoriesOpts.Add(blocktype);
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+
+
+            foreach (string blocktype in partSwapper.ShipParts.Keys)
+            {
+                if (blocktype.ToUpper().Contains("HYDROGENTANK"))
+                {
+                    PartSwapper.RenderSlowColoredText($"Found block type {blocktype} on your ship! Eligible for replacement!\n", 10, ConsoleColor.Green);
+                    UserShipCurrCatParts.Add(blocktype);
+                }
+                else
+                {
+                    continue;
+                }
+
+            }
+
+            UserPruneList(UserShipCurrCatParts);
+
+            // Iterates through the blockvariants that are on the ship already, and the relevant blockvariants we found from blockvariant files,
+            // And then we offer the user all the options for swapping out parts.
+            foreach (string blockvariant in UserShipCurrCatParts)
+            {
+                string blockvarSubstring = blockvariant.Remove(blockvariant.Length - 3);
+                List<string> tieredBlocks = UserPartCategoriesOpts.Where(item => item.Contains(blockvariant.Substring(0, blockvariant.Length - 2))).Distinct<string>().ToList();
+
+                for (int i = 0; i < tieredBlocks.Count<string>(); i++)
+                {
+                    Console.WriteLine($"{i} - {tieredBlocks[i]}");
+                }
+
+                Console.WriteLine($"What should we replace {blockvariant} with? C to continue.");
+
+                userInput = Console.ReadLine();
+
+                if (IsUserQuitting(userInput.ToUpper()))
+                {
+                    return;
+                }
+
+                if (userInput.ToUpper() == "C")
+                {
+                    Console.WriteLine("Continuing.");
+                    continue;
+                }
+
+                userInputInt = int.Parse(userInput);
+
+                PartSwapper.SwapPartsViaPartname(inputShipSBC, blockvariant, tieredBlocks[userInputInt], false);
+
+                Console.WriteLine($"{blockvariant} has been replaced with {tieredBlocks[userInputInt]}");
+            }
+
+        }
+
+        public static void OxygenTankSwapperTier(PartSwapper partSwapper, string inputShipSBC)
+        {
+            string userInput = "";
+            int userInputInt = -1;
+            string inputPartSwapOut;
+            string inputPartSwapIn;
+
+            List<string> UserPartCategoriesOpts = new List<string>();
+            List<string> UserShipCurrCatParts = new List<string>();
+
+            foreach (string blockvariant in partSwapper.BlockVariantsAvail.Keys)
+            {
+                foreach (string blocktype in partSwapper.BlockVariantsAvail[blockvariant])
+                {
+                    if (blocktype.ToUpper().Contains("OXYGENTANK"))
+                    {
+                        UserPartCategoriesOpts.Add(blocktype);
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+
+
+            foreach (string blocktype in partSwapper.ShipParts.Keys)
+            {
+                if (blocktype.ToUpper().Contains("OXYGENTANK"))
+                {
+                    PartSwapper.RenderSlowColoredText($"Found block type {blocktype} on your ship! Eligible for replacement!\n", 10, ConsoleColor.Green);
+                    UserShipCurrCatParts.Add(blocktype);
+                }
+                else
+                {
+                    continue;
+                }
+
+            }
+
+            UserPruneList(UserShipCurrCatParts);
+
+            // Iterates through the blockvariants that are on the ship already, and the relevant blockvariants we found from blockvariant files,
+            // And then we offer the user all the options for swapping out parts.
+            foreach (string blockvariant in UserShipCurrCatParts)
+            {
+                string blockvarSubstring = blockvariant.Remove(blockvariant.Length - 3);
+                List<string> tieredBlocks = UserPartCategoriesOpts.Where(item => item.Contains(blockvariant.Substring(0, blockvariant.Length - 2))).Distinct<string>().ToList();
+
+                for (int i = 0; i < tieredBlocks.Count<string>(); i++)
+                {
+                    Console.WriteLine($"{i} - {tieredBlocks[i]}");
+                }
+
+                Console.WriteLine($"What should we replace {blockvariant} with? C to continue.");
+
+                userInput = Console.ReadLine();
+
+                if (IsUserQuitting(userInput.ToUpper()))
+                {
+                    return;
+                }
+
+                if (userInput.ToUpper() == "C")
+                {
+                    Console.WriteLine("Continuing.");
+                    continue;
+                }
+
+                userInputInt = int.Parse(userInput);
+
+                PartSwapper.SwapPartsViaPartname(inputShipSBC, blockvariant, tieredBlocks[userInputInt], false);
+
+                Console.WriteLine($"{blockvariant} has been replaced with {tieredBlocks[userInputInt]}");
+            }
+
+        }
+
+        public static void CargoContainerSwapperTier(PartSwapper partSwapper, string inputShipSBC)
+        {
+            string userInput = "";
+            int userInputInt = -1;
+            string inputPartSwapOut;
+            string inputPartSwapIn;
+
+            List<string> UserPartCategoriesOpts = new List<string>();
+            List<string> UserShipCurrCatParts = new List<string>();
+
+            foreach (string blockvariant in partSwapper.BlockVariantsAvail.Keys)
+            {
+                foreach (string blocktype in partSwapper.BlockVariantsAvail[blockvariant])
+                {
+                    if (blocktype.ToUpper().Contains("CONTAINER"))
+                    {
+                        UserPartCategoriesOpts.Add(blocktype);
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+
+
+            foreach (string blocktype in partSwapper.ShipParts.Keys)
+            {
+                if (blocktype.ToUpper().Contains("CONTAINER"))
                 {
                     PartSwapper.RenderSlowColoredText($"Found block type {blocktype} on your ship! Eligible for replacement!\n", 10, ConsoleColor.Green);
                     UserShipCurrCatParts.Add(blocktype);
@@ -1532,15 +1952,15 @@ namespace PartSwapper
 
         public static void Main()
         {
-            DirectoryInfo[] blueprints;
-            FileInfo[] blueprintFiles;
+            DirectoryInfo[] Blueprints;
+            FileInfo[] BlueprintFiles;
             string UserInput = "";
             Boolean QuitFlag = false;
 
-            renderTextIntro();
+            RenderTextIntro();
 
             // This is all just dev and testing stuff
-            if (debug)
+            if (Debug)
             {
                 // Testing calls:
                 //swapParts("testShip.sbc", "LargeBlockGyro8x", "LargeBlockGyro", debug);
@@ -1563,23 +1983,31 @@ namespace PartSwapper
             while (!QuitFlag)
             {
 
-                blueprints = GetLocalDirectories();
+                Blueprints = GetLocalDirectories();
                 Console.WriteLine("PartSwapper found the following eligible blueprint folders:");
-                // iterates through all the blueprint directories we found and 
-                for (int i = 0; i < blueprints.Length; i++)
-                {
-                    blueprintFiles = blueprints[i].GetFiles("bp.sbc");
 
-                    for (int j = 0; j < blueprintFiles.Length; j++)
+                if (Blueprints.Length == 0)
+                {
+                    Console.WriteLine("ERROR: Unable to find any blueprint directories!\nYour only option is to quit. Sorry.");
+                }
+
+                // iterates through all the blueprint directories we found and 
+                for (int i = 0; i < Blueprints.Length; i++)
+                {
+                    BlueprintFiles = Blueprints[i].GetFiles("bp.sbc");
+
+                    for (int j = 0; j < BlueprintFiles.Length; j++)
                     {
-                        if (blueprintFiles[j].Name == "bp.sbc")
+                        if (BlueprintFiles[j].Name == "bp.sbc")
                         {
-                            Console.WriteLine($"{i} - {blueprints[i].Name}");
+                            Console.WriteLine($"{i} - {Blueprints[i].Name}");
                         }
                     }
                 }
 
                 PartSwapper.RenderSlowColoredText("Which blueprint you would like to swap parts out of?\nType 'Q' to quit. (case insensitive)\nSelection >", 5, ConsoleColor.Magenta);
+                
+
                 UserInput = Console.ReadLine();
 
                 if (UserInput.ToUpper() == "Q")
@@ -1588,24 +2016,41 @@ namespace PartSwapper
                     return;
                 }
 
-                if (blueprints[int.Parse(UserInput)] == null)
-                {
-                    Console.WriteLine("Invalid blueprint number!");
-                }
-                else
-                {
-                    blueprintFiles = blueprints[int.Parse(UserInput)].GetFiles("bp.sbc");
 
-                    foreach (FileInfo blueprintFile in blueprintFiles)
+                try
+                { 
+                    if (Blueprints[int.Parse(UserInput)] == null)
                     {
-                        Console.WriteLine($"Found blueprint file {blueprintFile.Name}");
-                        if (blueprintFile.Name == "bp.sbc")
+                        Console.WriteLine("Invalid blueprint number!");
+                    }
+                    else
+                    {
+                        BlueprintFiles = Blueprints[int.Parse(UserInput)].GetFiles("bp.sbc");
+
+                        foreach (FileInfo BlueprintFile in BlueprintFiles)
                         {
-                            Console.WriteLine("Found bp.sbc! Opening the ship up!");
-                            REPL(blueprintFile.FullName);
+                            if (Debug)
+                            {
+                                Console.WriteLine($"Found blueprint file {BlueprintFile.Name} in subdirectory {BlueprintFile.DirectoryName}");
+                            }
+
+                            if (BlueprintFile.Name == "bp.sbc")
+                            {
+                                if (Debug)
+                                {
+                                    Console.WriteLine($"DEBUG: Found bp.sbc in {BlueprintFile.DirectoryName}! Opening the ship up!");
+                                }
+
+                                REPL(BlueprintFile.FullName);
+                            }
                         }
                     }
+                } catch (Exception e)
+                {
+                    Console.WriteLine("ERROR: Bad input or failure while partswapping!");
+                    continue;
                 }
+
 
                 /*
                                blueprintFiles = blueprints[i].GetFiles("bp.sbc");
@@ -1622,7 +2067,7 @@ namespace PartSwapper
 
                 */
 
-                PartSwapper.RenderSlowColoredText("Returning to ship select menu.\n",10,ConsoleColor.DarkCyan);
+                PartSwapper.RenderSlowColoredText("Returning to ship select menu...\n",10,ConsoleColor.DarkCyan);
             }
         }
 
@@ -1634,30 +2079,31 @@ namespace PartSwapper
         {
             FileInfo[] BlockVariantFilesList;
 
-            string currentDirectory = Directory.GetCurrentDirectory();
+            string CurrentWorkingDirStr = Directory.GetCurrentDirectory();
 
-            DirectoryInfo currentDirInfo = new DirectoryInfo(currentDirectory);
+            DirectoryInfo CurrentWorkingDirInfo = new DirectoryInfo(CurrentWorkingDirStr);
 
-            BlockVariantFilesList = currentDirInfo.GetFiles("*BlockVariantGroups.sbc");
+            BlockVariantFilesList = CurrentWorkingDirInfo.GetFiles("*BlockVariantGroups.sbc");
 
-            Dictionary<string, HashSet<string>> Result = new Dictionary<string, HashSet<string>>();
-            HashSet<string> categorySet = new HashSet<string>();
+            Dictionary<string, HashSet<string>> BlockVariantsDict = new Dictionary<string, HashSet<string>>();
+
+            HashSet<string> BlockVariantsSet = new HashSet<string>();
 
             // Iterate through each file...
-            foreach (FileInfo file in BlockVariantFilesList)
+            foreach (FileInfo File in BlockVariantFilesList)
             {
-                XElement root = XElement.Load(file.ToString());
+                XElement root = XElement.Load(File.ToString());
 
                 XElement BlockVariantGroups = root.Element("BlockVariantGroups");
 
-                if (debug)
+                if (Debug)
                 {
-                    Console.WriteLine($"BlockVariantGroups looks like:\n {BlockVariantGroups}");
-                    Console.WriteLine("Iterating through all BlockVariantGroups. \n");
+                    Console.WriteLine($"DEBUG: BlockVariantGroups looks like:\n {BlockVariantGroups}");
+                    Console.WriteLine("DEBUG: Iterating through all BlockVariantGroups. \n");
 
-                    foreach (XElement category in BlockVariantGroups.Descendants())
+                    foreach (XElement Category in BlockVariantGroups.Descendants())
                     {
-                        Console.WriteLine(category);
+                        Console.WriteLine(Category);
                     }
                 }
 
@@ -1665,26 +2111,26 @@ namespace PartSwapper
                 foreach (XElement blockVariantGroup in BlockVariantGroups.Descendants())
                 {
 
-                    if (debug)
+                    if (Debug)
                     {
-                        Console.WriteLine($"Current blockVariantGroup is:\n{blockVariantGroup}\n");
+                        Console.WriteLine($"DEBUG: Current blockVariantGroup is:\n{blockVariantGroup}\n");
                     }
 
                     // Skip this blockVariantGroup if it has no elements
                     if (!blockVariantGroup.HasElements)
                     {
-                        if (debug)
+                        if (Debug)
                         {
-                            Console.WriteLine($"blockVariantGroup {blockVariantGroup.Name} has no elements!");
+                            Console.WriteLine($"DEBUG: blockVariantGroup {blockVariantGroup.Name} has no elements!");
                         }
                         continue;
                     }
 
                     IEnumerable<XElement> currBlocks = blockVariantGroup.Elements();
 
-                    if (debug)
+                    if (Debug)
                     {
-                        Console.WriteLine($"Iterating through elements found in blockVariantGroup.Elements()\n");
+                        Console.WriteLine($"DEBUG: Iterating through elements found in blockVariantGroup.Elements()\n");
                         foreach (XElement element in blockVariantGroup.Elements())
                         {
                             Console.WriteLine(element);
@@ -1695,7 +2141,7 @@ namespace PartSwapper
                             Console.WriteLine(attribute);
                         }
 
-                        Console.WriteLine($"currBlocks is:\n {currBlocks.ToString()}");
+                        Console.WriteLine($"DEBUG: currBlocks is:\n {currBlocks.ToString()}");
 
                     }
 
@@ -1703,22 +2149,22 @@ namespace PartSwapper
                     {
                         string subtype = block.Attribute("Subtype").Value;
 
-                        if (debug)
+                        if (Debug)
                         {
                             Console.WriteLine("DEBUG: Found the following subtype...");
                             Console.WriteLine(subtype);
                         }
 
-                        categorySet.Add(subtype);
+                        BlockVariantsSet.Add(subtype);
                     }
 
-                    if (debug)
+                    if (Debug)
                     {
-                        foreach (string key in Result.Keys)
+                        foreach (string key in BlockVariantsDict.Keys)
                         {
-                            Console.WriteLine($"\n\nkey:\n{key},\n\nresult:");
+                            Console.WriteLine($"DEBUG: \n\nkey:\n{key},\n\nresult:");
 
-                            foreach (string value in Result[key])
+                            foreach (string value in BlockVariantsDict[key])
                             {
                                 Console.WriteLine(value);
                             }
@@ -1726,14 +2172,14 @@ namespace PartSwapper
                     }
                 }
 
-                Result[file.Name.ToString()] = categorySet;
+                BlockVariantsDict[File.Name.ToString()] = BlockVariantsSet;
 
             }
-            return Result;
+            return BlockVariantsDict;
         }
 
-        // Copies the XML document
-        public static void backupXML(string filename)
+        // Creates a backup of the XML document
+        public static void BackupShipXMLTimestamp(string filename)
         {
             XmlDocument xmlDoc = new XmlDocument();
 
@@ -1748,6 +2194,8 @@ namespace PartSwapper
             xwrSettings.Indent = true;
             xwrSettings.NewLineChars = "\n";
 
+            // todo: Find a way to add the grid name to the backup filename
+            string GridName = "";
             string timestamp = DateTime.Now.ToString("yyyyMMdd");
             string BackupFilename = timestamp + "pps_bp_bak.sbc";
 
@@ -1757,9 +2205,9 @@ namespace PartSwapper
             }
         }
 
-        private static Dictionary<string, List<XElement>> generatePartsLists(string filename)
+        private static Dictionary<string, List<XElement>> GenerateShipPartsList(string filename)
         {
-            Dictionary<string, List<XElement>> result = new Dictionary<string, List<XElement>>();
+            Dictionary<string, List<XElement>> ShipPartsList = new Dictionary<string, List<XElement>>();
 
             XElement root = XElement.Load(filename);
 
@@ -1769,26 +2217,19 @@ namespace PartSwapper
 
             Console.WriteLine($"Found ship:{shipname.Value}");
 
-            if (debug)
-            {
-                //Console.WriteLine("Printing cubeblocks found by generatePartsLists");
-                //Console.WriteLine(cubeblocks);
-            }
-
             IEnumerable<XElement> CubeBlocksChildren = cubeblocks.Descendants();
 
             //Iterate through each block, creating the lists (if necessary) to populate a string:List<Xelement> dictionary that will comprise the catalogue of parts in a ship.
             foreach (XElement block in CubeBlocksChildren)
             {
-                if (debug)
+                if (Debug)
                 {
                     Console.WriteLine($"DEBUG: generatePartsLists found block {block.ToString()}");
-
                 }
 
                 try
                 {
-                    if (debug)
+                    if (Debug)
                     {
                         try
                         {
@@ -1800,17 +2241,18 @@ namespace PartSwapper
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine("DEBUG CAUGHT ERROR!...But it's safe to proceed.\n");
+                            Console.WriteLine("DEBUG: CAUGHT ERROR! Printing Error below:");
                             Console.Write(e.ToString());
                         }
                     }
 
                     if (block.Element("SubtypeName") != null)
                     {
-                        xElements = result[block.Element("SubtypeName").Value.ToString()];
+                        xElements = ShipPartsList[block.Element("SubtypeName").Value.ToString()];
+
                         xElements.Add(block);
 
-                        result[block.Element("SubtypeName").Value.ToString()] = xElements;
+                        ShipPartsList[block.Element("SubtypeName").Value.ToString()] = xElements;
                     }
 
                 }
@@ -1819,9 +2261,9 @@ namespace PartSwapper
                     if (kms.GetType() == typeof(NullReferenceException))
                     {
 
-                        if (debug)
+                        if (Debug)
                         {
-                            Console.WriteLine("Caught null exception!");
+                            Console.WriteLine("DEBUG: Caught null exception!");
                         }
 
                         // situation where the try block fails due to the subtypeName field being non-existent
@@ -1834,35 +2276,34 @@ namespace PartSwapper
                         // situation where the try block fails due to key not found.
                         // this is ESSENTIAL here.
 
-                        if (debug)
+                        if (Debug)
                         {
-                            Console.WriteLine(kms.ToString() + "\n\nKey not found! Creating new List and adding " + block.Name.ToString());
+                            Console.WriteLine("DEBUG: Key not found! Creating new List and adding key" + block.Name.ToString() + "to the new list! ");
+                            Console.WriteLine("\n" + kms.ToString());
                         }
 
                         xElements = new List<XElement>();
                         xElements.Add(block);
 
-                        result[block.Element("SubtypeName").Value.ToString()] = xElements;
-
+                        ShipPartsList[block.Element("SubtypeName").Value.ToString()] = xElements;
                     }
-
                 }
             }
 
-            if (debug)
+            if (Debug)
             {
-                Console.WriteLine($"DEBUG: result is... \n{result}");
+                Console.WriteLine($"DEBUG: result is... \n{ShipPartsList}");
             }
 
-            foreach (string type in result.Keys)
+            foreach (string type in ShipPartsList.Keys)
             {
-                if (debug)
+                if (Debug)
                 {
-                    Console.WriteLine($"key: {type}, count: {result[type].Count()}");
+                    Console.WriteLine($"DEBUG:\nkey: {type},\ncount: {ShipPartsList[type].Count()}.");
                     //Console.WriteLine($"key: {type}, count: {result[type].Count()}, value: {result[type][0]}");
                 }
             }
-            return result;
+            return ShipPartsList;
         }
 
         public static void SwapPartsViaPartname(string filename, string oldPart, string newPart, bool debug)
@@ -1883,12 +2324,12 @@ namespace PartSwapper
             XElement currPart;
 
             //backup the original grid
-            backupXML(filename);
+            BackupShipXMLTimestamp(filename);
 
             if (debug)
             {
                 // debug, iterate all elements so you can see them
-                Console.WriteLine("DEBUG:Iterating through entire document!\n");
+                Console.WriteLine("DEBUG: Iterating through entire document!\n");
 
                 foreach (XElement shipElement in shipTree.Elements())
                 {
@@ -1896,7 +2337,7 @@ namespace PartSwapper
                 }
 
                 // debug, iterate all cubeblocks so you can see them
-                Console.WriteLine($"DEBUG:Cubeblocks is:\n {CubeBlocks}\n\n");
+                Console.WriteLine($"DEBUG: Cubeblocks is:\n {CubeBlocks}\n\n");
             }
 
             // Iterate CubeBlocks
@@ -1904,7 +2345,7 @@ namespace PartSwapper
             {
                 if (debug)
                 {
-                    Console.WriteLine($"DEBUG:Checking element:{cubeBlock}");
+                    Console.WriteLine($"DEBUG: Checking element:{cubeBlock}");
                 }
 
                 if (!cubeBlock.Element("SubtypeName").Value.ToString().Equals(oldPart))
@@ -1925,7 +2366,7 @@ namespace PartSwapper
                     if (debug)
                     {
                         // if it does match - swap the part
-                        Console.WriteLine($"Found XML part: {currPart}\n Replacing {oldPart} with {newPart}");
+                        Console.WriteLine($"DEBUG: Found XML part: {currPart}\n Replacing {oldPart} with {newPart}");
                     }
 
                     currPart.SetValue(newPart);
@@ -1933,7 +2374,7 @@ namespace PartSwapper
                     //debug output
                     if (debug)
                     {
-                        Console.WriteLine($"DEBUG:Subtypename post-op:{currPart}");
+                        Console.WriteLine($"DEBUG: Subtypename post-swap:{currPart}");
                     }
                 }
             }
