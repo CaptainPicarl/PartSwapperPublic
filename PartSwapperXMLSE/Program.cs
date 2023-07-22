@@ -695,7 +695,7 @@ namespace PartSwapper
 
                 userInput = Console.ReadLine();
 
-                if (IsUserQuitting(userInput.ToUpper()))
+                if (IsUserQuitting(userInput.ToUpper(), debug))
                 {
                     return;
                 }
@@ -808,6 +808,7 @@ namespace PartSwapper
 
         public static void PartSwapTUI(PartSwapper partSwapper, string inputShipSBC, string partCategoryString)
         {
+            bool debug = false;
             string userInput = "";
             int userInputInt = -1;
             string inputPartSwapOut;
@@ -864,7 +865,7 @@ namespace PartSwapper
 
                 userInput = Console.ReadLine();
 
-                if (IsUserQuitting(userInput.ToUpper()))
+                if (IsUserQuitting(userInput.ToUpper(), debug))
                 {
                     return;
                 }
@@ -966,6 +967,8 @@ namespace PartSwapper
 
         public static void AssemblerSwapper(PartSwapper partSwapper, string inputShipSBC)
         {
+            bool debug = false;
+
             string userInput = "";
             int userInputInt = -1;
             string inputPartSwapOut;
@@ -1020,7 +1023,7 @@ namespace PartSwapper
 
                 userInput = Console.ReadLine();
 
-                if (IsUserQuitting(userInput.ToUpper()))
+                if (IsUserQuitting(userInput.ToUpper(), debug))
                 {
                     return;
                 }
@@ -1041,6 +1044,8 @@ namespace PartSwapper
 
         public static void RefinerySwapper(PartSwapper partSwapper, string inputShipSBC)
         {
+            bool debug = false;
+
             string userInput = "";
             int userInputInt = -1;
             string inputPartSwapOut;
@@ -1095,7 +1100,7 @@ namespace PartSwapper
 
                 userInput = Console.ReadLine();
 
-                if (IsUserQuitting(userInput.ToUpper()))
+                if (IsUserQuitting(userInput.ToUpper(), debug))
                 {
                     return;
                 }
@@ -1361,6 +1366,8 @@ namespace PartSwapper
 
         public static void AtmoThrusterSwapperTier(PartSwapper partSwapper, string inputShipSBC)
         {
+            bool debug = false;
+
             string userInput = "";
             int userInputInt = -1;
             string inputPartSwapOut;
@@ -1421,7 +1428,7 @@ namespace PartSwapper
 
                 userInput = Console.ReadLine();
 
-                if (IsUserQuitting(userInput.ToUpper()))
+                if (IsUserQuitting(userInput.ToUpper(), debug))
                 {
                     return;
                 }
@@ -1443,6 +1450,8 @@ namespace PartSwapper
 
         public static void IonThrusterSwapperTier(PartSwapper partSwapper, string inputShipSBC)
         {
+            bool debug = false;
+
             string userInput = "";
             int userInputInt = -1;
             string inputPartSwapOut;
@@ -1503,7 +1512,7 @@ namespace PartSwapper
 
                 userInput = Console.ReadLine();
 
-                if (IsUserQuitting(userInput.ToUpper()))
+                if (IsUserQuitting(userInput.ToUpper(), debug))
                 {
                     return;
                 }
@@ -1524,6 +1533,7 @@ namespace PartSwapper
 
         public static void HydrogenThrusterSwapperTier(PartSwapper partSwapper, string inputShipSBC)
         {
+            bool debug = false;
             string userInput = "";
             int userInputInt = -1;
             string inputPartSwapOut;
@@ -1582,7 +1592,7 @@ namespace PartSwapper
 
                 userInput = Console.ReadLine();
 
-                if (IsUserQuitting(userInput.ToUpper()))
+                if (IsUserQuitting(userInput.ToUpper(), debug))
                 {
                     return;
                 }
@@ -1603,6 +1613,7 @@ namespace PartSwapper
         }
         public static void BatterySwapperTier(PartSwapper partSwapper, string inputShipSBC)
         {
+            bool debug = false;
             string userInput = "";
             int userInputInt = -1;
             string inputPartSwapOut;
@@ -1659,7 +1670,7 @@ namespace PartSwapper
 
                 userInput = Console.ReadLine();
 
-                if (IsUserQuitting(userInput.ToUpper()))
+                if (IsUserQuitting(userInput.ToUpper(), debug))
                 {
                     return;
                 }
@@ -1680,6 +1691,7 @@ namespace PartSwapper
         }
         public static void GyroSwapperTier(PartSwapper partSwapper, string inputShipSBC)
         {
+            bool debug = false;
             string userInput = "";
             int userInputInt = -1;
             string inputPartSwapOut;
@@ -1736,7 +1748,7 @@ namespace PartSwapper
 
                 userInput = Console.ReadLine();
 
-                if (IsUserQuitting(userInput.ToUpper()))
+                if (IsUserQuitting(userInput.ToUpper(), debug))
                 {
                     return;
                 }
@@ -1758,6 +1770,7 @@ namespace PartSwapper
 
         public static void JumpDriveSwapperTier(PartSwapper partSwapper, string inputShipSBC)
         {
+            bool debug = false;
             string userInput = "";
             int userInputInt = -1;
             string inputPartSwapOut;
@@ -1814,7 +1827,7 @@ namespace PartSwapper
 
                 userInput = Console.ReadLine();
 
-                if (IsUserQuitting(userInput.ToUpper()))
+                if (IsUserQuitting(userInput.ToUpper(), debug))
                 {
                     return;
                 }
@@ -1967,6 +1980,7 @@ namespace PartSwapper
 
         public static void HydroTankSwapperTier(PartSwapper partSwapper, string inputShipSBC)
         {
+            bool debug = false;
             string userInput = "";
             int userInputInt = -1;
             string inputPartSwapOut;
@@ -2023,7 +2037,7 @@ namespace PartSwapper
 
                 userInput = Console.ReadLine();
 
-                if (IsUserQuitting(userInput.ToUpper()))
+                if (IsUserQuitting(userInput.ToUpper(), debug))
                 {
                     return;
                 }
@@ -2045,6 +2059,7 @@ namespace PartSwapper
 
         public static void OxygenTankSwapperTier(PartSwapper partSwapper, string inputShipSBC)
         {
+            bool debug = false;
             string userInput = "";
             int userInputInt = -1;
             string inputPartSwapOut;
@@ -2101,7 +2116,7 @@ namespace PartSwapper
 
                 userInput = Console.ReadLine();
 
-                if (IsUserQuitting(userInput.ToUpper()))
+                if (IsUserQuitting(userInput.ToUpper(), debug))
                 {
                     return;
                 }
@@ -2123,6 +2138,7 @@ namespace PartSwapper
 
         public static void CargoContainerSwapperTier(PartSwapper partSwapper, string inputShipSBC)
         {
+            bool debug = false;
             string userInput = "";
             int userInputInt = -1;
             string inputPartSwapOut;
@@ -2179,7 +2195,7 @@ namespace PartSwapper
 
                 userInput = Console.ReadLine();
 
-                if (IsUserQuitting(userInput.ToUpper()))
+                if (IsUserQuitting(userInput.ToUpper(), debug))
                 {
                     return;
                 }
@@ -2201,6 +2217,7 @@ namespace PartSwapper
 
         public static void DrillSwapperTier(PartSwapper partSwapper, string inputShipSBC)
         {
+            bool debug = false;
             string userInput = "";
             int userInputInt = -1;
             string inputPartSwapOut;
@@ -2257,7 +2274,7 @@ namespace PartSwapper
 
                 userInput = Console.ReadLine();
 
-                if (IsUserQuitting(userInput.ToUpper()))
+                if (IsUserQuitting(userInput.ToUpper(), debug))
                 {
                     return;
                 }
@@ -2279,6 +2296,7 @@ namespace PartSwapper
 
         public static void ConveyorSwapperTier(PartSwapper partSwapper, string inputShipSBC)
         {
+            bool debug = false;
             string userInput = "";
             int userInputInt = -1;
             string inputPartSwapOut;
@@ -2335,7 +2353,7 @@ namespace PartSwapper
 
                 userInput = Console.ReadLine();
 
-                if (IsUserQuitting(userInput.ToUpper()))
+                if (IsUserQuitting(userInput.ToUpper(), debug))
                 {
                     return;
                 }
@@ -2357,6 +2375,7 @@ namespace PartSwapper
 
         public static void UserPruneList(List<string> list)
         {
+            bool debug = false;
             // this function gives the user an input to modify a list.
             int UserSelection = -1;
             string UserInput = "";
@@ -2379,7 +2398,7 @@ namespace PartSwapper
                 else
                 {
 
-                    if (IsUserQuitting(UserInput.ToUpper()))
+                    if (IsUserQuitting(UserInput.ToUpper(), debug))
                     {
                         return;
                     }
@@ -2391,15 +2410,22 @@ namespace PartSwapper
             }
         }
 
-        public static bool IsUserQuitting(string userInp)
+        public static bool IsUserQuitting(string userInp, bool debug)
         {
             if (userInp.ToUpper() == "Q")
             {
-                Console.WriteLine("Quitting!");
+                if (debug)
+                {
+                    Console.WriteLine("DEBUG: IsUserQuitting: User IS Quitting!");
+                }
                 return true;
             }
             else
             {
+                if (debug)
+                {
+                    Console.WriteLine("DEBUG: IsUserQuitting: User IS NOT Quitting!");
+                }
                 return false;
             }
         }
@@ -2871,55 +2897,61 @@ namespace PartSwapper
             //backup the original grid
             BackupShipXMLTimestamp(filename);
 
-            LoopStart:
-            Console.WriteLine("Please select which CubeGrid definition to remove from the ShipBlueprint.\nQ to Quit.\n");
-
-            // Get the CubeGrids again (in case we are in a loop and checking post-removal)
-            CubeGrids = ShipBP.Element("CubeGrids");
-
-            // Put the elements in an array. The references should still be edit-able...I hope.
-            XElement[] CubeGridsArr = CubeGrids.Elements().ToArray();
-
-            // Iterate Cubegrids to offer for deletion.
-            for(int i = 0; i < CubeGridsArr.Length; i++)
+            if (CubeGrids.Elements().Count() > 1)
             {
-                Console.WriteLine($"{i} - {CubeGridsArr[i].Element("DisplayName").Value}");
-            }
+                Console.WriteLine("Partswapper detected multiple CubeGrid defintions!\nThis is typically a mistake - You blueprinted multiple grids when they were connected together!" +
+                    "\n...Or you have rotors. In which case: You may safely quit.\n");
+                LoopStart:
+                Console.WriteLine("Please select which CubeGrid definition to remove from the Blueprint, if any.\nQ to Quit and continue the program.\n");
 
-            // 
-            UserInput = Console.ReadLine();
+                // Get the CubeGrids again (in case we are in a loop and checking post-removal)
+                CubeGrids = ShipBP.Element("CubeGrids");
 
-            if (IsUserQuitting(UserInput))
-            {
-                Console.WriteLine("User declined to delete any cubeGrids definitions. Continuing!");
-                return;
-            }
+                // Put the elements in an array. The references should still be edit-able...I hope.
+                XElement[] CubeGridsArr = CubeGrids.Elements().ToArray();
 
-            UserInputInt = Int32.Parse(UserInput);
+                // Iterate Cubegrids to offer for deletion.
+                for (int i = 0; i < CubeGridsArr.Length; i++)
+                {
+                    Console.WriteLine($"{i} - {CubeGridsArr[i].Element("DisplayName").Value}");
+                }
 
-            Console.WriteLine($"Deleting {CubeGridsArr[UserInputInt].Element("DisplayName").Value} from ShipBluePrint!");
+                // 
+                UserInput = Console.ReadLine();
 
-            CubeGridsArr[UserInputInt].Remove();
-
-            if (debug)
-            {
-                Console.WriteLine($"New ShipBluePrints looks like:\n{ShipBP.ToString()}");
-            }
-
-            Console.WriteLine("Remove another CubeGrid definition from the ShipBluePrint?\n[Y]es/[N]o");
-
-            UserInput = Console.ReadLine();
-
-            switch (UserInput.ToUpper()) {
-                case "Y":
-                    goto LoopStart;
-                case "N":
-                    Console.WriteLine("User declined to delete more CubeGrid definitions! Saving changes to file!");
-                    shipTree.Save(filename);
+                if (IsUserQuitting(UserInput,debug))
+                {
+                    Console.WriteLine("User declined to delete any cubeGrids definitions. Continuing!");
                     return;
-                default:
-                    Console.WriteLine("ERROR: You entered nonsense. So I'm quitting. NO CHANGES HAVE BEEN MADE!");
-                    return;
+                }
+
+                UserInputInt = Int32.Parse(UserInput);
+
+                Console.WriteLine($"Deleting {CubeGridsArr[UserInputInt].Element("DisplayName").Value} from ShipBluePrint!");
+
+                CubeGridsArr[UserInputInt].Remove();
+
+                if (debug)
+                {
+                    Console.WriteLine($"New ShipBluePrints looks like:\n{ShipBP.ToString()}");
+                }
+
+                Console.WriteLine("Remove another CubeGrid definition from the ShipBluePrint?\n[Y]es/[N]o");
+
+                UserInput = Console.ReadLine();
+
+                switch (UserInput.ToUpper())
+                {
+                    case "Y":
+                        goto LoopStart;
+                    case "N":
+                        Console.WriteLine("User declined to delete more CubeGrid definitions! Saving changes to file and continuing!");
+                        shipTree.Save(filename);
+                        return;
+                    default:
+                        Console.WriteLine("ERROR: You entered nonsense. So I'm continuing. NO CHANGES HAVE BEEN MADE!");
+                        return;
+                }
             }
         }
 
